@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX CrossFit — Forge Your Limits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0a0a0a;
+      --bg2:     #111111;
+      --bg3:     #141414;
+      --orange:  #ff4500;
+      --orange2: #ff6030;
+      --text:    #f0f0f0;
+      --mid:     rgba(240,240,240,0.5);
+      --dim:     rgba(240,240,240,0.25);
+      --border:  rgba(255,69,0,0.15);
+      --border2: rgba(255,255,255,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 52px;
+      transition: background 0.4s, border-bottom 0.4s;
+    }
+    #nav.solid {
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border2);
+    }
+    .nav-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--orange); }
+    .nav-links {
+      display: flex; align-items: center; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-join {
+      background: var(--orange) !important;
+      color: white !important;
+      padding: 9px 24px !important;
+      border-radius: 3px !important;
+      font-weight: 600 !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+    .nav-join:hover { background: var(--orange2) !important; transform: translateY(-1px) !important; }
+
+    /* ── HERO ────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 100px 52px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid lines background */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,69,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,69,0,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 80% at 100% 50%, rgba(255,69,0,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 60% at 0% 50%, rgba(0,0,0,0.8) 0%, transparent 60%);
+    }
+
+    /* Big background text */
+    .hero-bg-text {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(180px, 22vw, 320px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: rgba(255,69,0,0.04);
+      line-height: 1;
+      pointer-events: none;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(255,69,0,0.1);
+      border: 1px solid rgba(255,69,0,0.25);
+      border-radius: 3px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .hero-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(64px, 10vw, 130px);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 0.92;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.4s forwards;
+    }
+    .hero-title .highlight {
+      display: block;
+      color: var(--orange);
+      -webkit-text-stroke: 0px;
+      text-shadow: 0 0 80px rgba(255,69,0,0.3);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--mid);
+      line-height: 1.65;
+      max-width: 480px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.65s forwards;
+    }
+
+    .hero-btns {
+      display: flex; gap: 16px; align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.85s forwards;
+    }
+    .btn-orange {
+      background: var(--orange);
+      color: white;
+      padding: 15px 36px;
+      border-radius: 3px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-orange:hover {
+      background: var(--orange2);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(255,69,0,0.4);
+    }
+    .btn-ghost-orange {
+      color: var(--mid);
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s, gap 0.2s;
+    }
+    .btn-ghost-orange:hover { color: var(--text); gap: 12px; }
+
+    /* ── STATS ───────────────────────────────── */
+    #stats {
+      background: var(--bg2);
+      border-top: 1px solid var(--border2);
+      border-bottom: 1px solid var(--border2);
+      padding: 72px 52px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .stat-block {
+      text-align: center;
+      padding: 24px;
+      border-right: 1px solid var(--border2);
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-block.visible { opacity: 1; transform: none; }
+    .stat-block:nth-child(2) { transition-delay: 0.1s; }
+    .stat-block:nth-child(3) { transition-delay: 0.2s; }
+    .stat-block:nth-child(4) { transition-delay: 0.3s; }
+    .stat-n {
+      font-family: 'Oswald', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--orange);
+      line-height: 1;
+      display: block;
+    }
+    .stat-n sup { font-size: 0.4em; vertical-align: super; }
+    .stat-l {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-top: 8px;
+    }
+
+    /* ── CLASSES ─────────────────────────────── */
+    #classes {
+      padding: 120px 52px;
+    }
+    .sec-tag {
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+    }
+    .sec-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(40px, 5vw, 68px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.0;
+      margin-bottom: 64px;
+    }
+    .sec-title span { color: var(--orange); }
+
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .class-card {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(36px);
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .class-card.visible { opacity: 1; transform: none; }
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--orange);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s ease;
+    }
+    .class-card:hover {
+      border-color: rgba(255,69,0,0.3);
+      box-shadow: 0 8px 32px rgba(255,69,0,0.08);
+    }
+    .class-card:hover::before { transform: scaleY(1); }
+    .class-time {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 14px;
+    }
+    .class-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .class-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--mid);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .class-meta {
+      display: flex;
+      gap: 20px;
+    }
+    .class-tag {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .class-tag::before {
+      content: '';
+      width: 4px; height: 4px;
+      background: var(--orange);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    /* ── MEMBERSHIP ──────────────────────────── */
+    #membership {
+      padding: 120px 52px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border2);
+    }
+    .membership-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 64px;
+    }
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .plan-card {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 44px 36px;
+      position: relative;
+      transform: translateY(40px);
+      opacity: 0;
+      transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.3s;
+    }
+    .plan-card.visible { opacity: 1; transform: none; }
+    .plan-card:nth-child(2) { transition-delay: 0.12s; }
+    .plan-card:nth-child(3) { transition-delay: 0.24s; }
+    .plan-card.featured {
+      border-color: var(--orange);
+      background: rgba(255,69,0,0.04);
+    }
+    .plan-badge {
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: white;
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 16px;
+      border-radius: 3px;
+    }
+    .plan-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .plan-price {
+      font-family: 'Oswald', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .plan-price sup {
+      font-size: 0.4em;
+      vertical-align: super;
+      color: var(--mid);
+    }
+    .plan-price sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--mid);
+    }
+    .plan-period {
+      font-size: 12px;
+      color: var(--dim);
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border2);
+    }
+    .plan-features {
+      list-style: none;
+      margin-bottom: 36px;
+    }
+    .plan-features li {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--mid);
+      padding: 9px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .plan-features li::before {
+      content: '';
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(255,69,0,0.1);
+      border: 1px solid rgba(255,69,0,0.3);
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23ff4500' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      border-radius: 4px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .plan-btn:hover { transform: translateY(-2px); }
+    .plan-btn-outline {
+      border: 1px solid var(--border2);
+      color: var(--mid);
+    }
+    .plan-btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+    .plan-btn-solid {
+      background: var(--orange);
+      color: white;
+    }
+    .plan-btn-solid:hover { box-shadow: 0 8px 28px rgba(255,69,0,0.4); }
+
+    /* ── CTA BANNER ──────────────────────────── */
+    #cta {
+      padding: 120px 52px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255,69,0,0.08) 0%, transparent 70%);
+    }
+    .cta-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,69,0,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,69,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .cta-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(52px, 8vw, 100px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 0.95;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .cta-title span { color: var(--orange); display: block; }
+    .cta-sub {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--mid);
+      margin-bottom: 48px;
+      position: relative;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border2);
+      padding: 48px 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--text);
+    }
+    .footer-logo span { color: var(--orange); }
+    .footer-links {
+      display: flex; gap: 28px; list-style: none;
+    }
+    .footer-links a {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: var(--dim); }
+
+    /* ── ANIMATIONS ──────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.up { opacity: 1; transform: none; }
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+  </style>
+</head>
+<body>
+
+  <nav id="nav">
+    <a href="#" class="nav-logo">APE<span>X</span></a>
+    <ul class="nav-links">
+      <li><a href="#classes">Classes</a></li>
+      <li><a href="#membership">Membership</a></li>
+      <li><a href="#stats">Results</a></li>
+      <li><a href="#membership" class="nav-join">Join Now</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-bg-text">APEX</div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Now Enrolling New Members
+      </div>
+      <h1 class="hero-title">
+        Forge Your
+        <span class="highlight">Limits.</span>
+      </h1>
+      <p class="hero-sub">
+        APEX CrossFit is where ordinary people do extraordinary things.
+        Elite coaching. Community-driven. Results that speak for themselves.
+      </p>
+      <div class="hero-btns">
+        <a href="#membership" class="btn-orange">Start Free Trial</a>
+        <a href="#classes" class="btn-ghost-orange">
+          See Classes
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats">
+    <div class="stat-block">
+      <span class="stat-n" data-target="847">0</span>
+      <div class="stat-l">Active Members</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-n" data-target="32">0</span>
+      <div class="stat-l">Classes Per Week</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-n" data-target="12">0</span>
+      <div class="stat-l">Expert Coaches</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-n">6<sup>+</sup></span>
+      <div class="stat-l">Years Strong</div>
+    </div>
+  </section>
+
+  <!-- CLASSES -->
+  <section id="classes">
+    <p class="sec-tag reveal">Train With Us</p>
+    <h2 class="sec-title reveal d1">Find Your<br><span>Workout.</span></h2>
+    <div class="classes-grid">
+      <div class="class-card">
+        <div class="class-time">6:00 AM · 12:00 PM · 5:30 PM</div>
+        <div class="class-name">CrossFit</div>
+        <p class="class-desc">Our signature WOD — constantly varied functional movements at high intensity. The total package of strength, endurance, and agility.</p>
+        <div class="class-meta">
+          <span class="class-tag">All Levels</span>
+          <span class="class-tag">60 min</span>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-time">7:00 AM · 6:30 PM</div>
+        <div class="class-name">Olympic Lifting</div>
+        <p class="class-desc">Master the snatch and clean & jerk under expert guidance. Build raw power, explosiveness, and precision technique.</p>
+        <div class="class-meta">
+          <span class="class-tag">Intermediate</span>
+          <span class="class-tag">75 min</span>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-time">5:30 AM · 4:00 PM</div>
+        <div class="class-name">HIIT Cardio</div>
+        <p class="class-desc">High-intensity intervals that torch calories and build conditioning fast. No barbell required — just maximum effort.</p>
+        <div class="class-meta">
+          <span class="class-tag">All Levels</span>
+          <span class="class-tag">45 min</span>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-time">8:00 AM · 7:00 PM</div>
+        <div class="class-name">Strength &amp; Power</div>
+        <p class="class-desc">Progressive barbell programming focused on squats, deadlifts, and pressing. Build the foundation everything else stands on.</p>
+        <div class="class-meta">
+          <span class="class-tag">All Levels</span>
+          <span class="class-tag">60 min</span>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-time">9:30 AM · 5:00 PM</div>
+        <div class="class-name">Gymnastics</div>
+        <p class="class-desc">Pull-ups, muscle-ups, handstands, and ring work. Develop bodyweight mastery that translates to every other movement.</p>
+        <div class="class-meta">
+          <span class="class-tag">Beginner+ </span>
+          <span class="class-tag">60 min</span>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-time">Sat &amp; Sun · 9:00 AM</div>
+        <div class="class-name">Open Gym</div>
+        <p class="class-desc">The floor is yours. Work on weaknesses, hit a personal record, or just move freely. Coaches available for guidance.</p>
+        <div class="class-meta">
+          <span class="class-tag">All Levels</span>
+          <span class="class-tag">90 min</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERSHIP -->
+  <section id="membership">
+    <div class="membership-intro">
+      <div>
+        <p class="sec-tag reveal">Pricing</p>
+        <h2 class="sec-title reveal d1" style="margin-bottom:0">Choose Your<br><span>Plan.</span></h2>
+      </div>
+      <p class="reveal" style="font-size:14px;color:var(--mid);max-width:280px;text-align:right;line-height:1.65;">
+        All plans include unlimited access to classes, coaching, and our member community.
+      </p>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>$</sup>99<sub>/mo</sub></div>
+        <p class="plan-period">Month-to-month · Cancel anytime</p>
+        <ul class="plan-features">
+          <li>8 Classes Per Month</li>
+          <li>Access to All Class Types</li>
+          <li>Member App Access</li>
+          <li>Community Events</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Get Started</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Unlimited</div>
+        <div class="plan-price"><sup>$</sup>149<sub>/mo</sub></div>
+        <p class="plan-period">Month-to-month · Cancel anytime</p>
+        <ul class="plan-features">
+          <li>Unlimited Classes</li>
+          <li>Priority Class Booking</li>
+          <li>1 Free PT Session / Month</li>
+          <li>Nutrition Guidance</li>
+          <li>Member App Access</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-solid">Get Started</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Elite</div>
+        <div class="plan-price"><sup>$</sup>229<sub>/mo</sub></div>
+        <p class="plan-period">3-month commitment</p>
+        <ul class="plan-features">
+          <li>Unlimited Classes</li>
+          <li>4 PT Sessions / Month</li>
+          <li>Custom Programming</li>
+          <li>Competition Prep</li>
+          <li>Recovery &amp; Mobility</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Get Started</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section id="cta">
+    <div class="cta-bg"></div>
+    <h2 class="cta-title reveal">
+      First class
+      <span>is free.</span>
+    </h2>
+    <p class="cta-sub reveal d1">No commitment. No intimidation. Just show up.</p>
+    <div class="reveal d2" style="position:relative;">
+      <a href="#" class="btn-orange" style="font-size:16px;padding:18px 48px;">Claim Free Class</a>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-logo">APE<span>X</span></span>
+    <ul class="footer-links">
+      <li><a href="#">Classes</a></li>
+      <li><a href="#">Schedule</a></li>
+      <li><a href="#">Instagram</a></li>
+    </ul>
+    <span class="footer-copy">© 2025 APEX CrossFit</span>
+  </footer>
+
+  <script>
+    'use strict';
+
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('solid', window.scrollY > 40);
+    }, { passive: true });
+
+    // Reveal
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('up'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // Stats counter
+    const statsObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('.stat-block').forEach((block, i) => {
+          setTimeout(() => {
+            block.classList.add('visible');
+            const el = block.querySelector('[data-target]');
+            if (!el) return;
+            const target = parseInt(el.dataset.target);
+            const duration = 1400;
+            const start = performance.now();
+            function tick(now) {
+              const p = Math.min((now - start) / duration, 1);
+              const ease = 1 - Math.pow(1 - p, 3);
+              el.textContent = Math.round(ease * target);
+              if (p < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }, i * 120);
+        });
+        statsObs.unobserve(entry.target);
+      });
+    }, { threshold: 0.3 });
+    const statsEl = document.getElementById('stats');
+    if (statsEl) statsObs.observe(statsEl);
+
+    // Classes stagger
+    const classObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('.class-card').forEach((card, i) => {
+          setTimeout(() => card.classList.add('visible'), i * 90);
+        });
+        classObs.unobserve(entry.target);
+      });
+    }, { threshold: 0.05 });
+    const classGrid = document.querySelector('.classes-grid');
+    if (classGrid) classObs.observe(classGrid);
+
+    // Plans stagger
+    const planObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('.plan-card').forEach((card, i) => {
+          setTimeout(() => card.classList.add('visible'), i * 120);
+        });
+        planObs.unobserve(entry.target);
+      });
+    }, { threshold: 0.1 });
+    const plansGrid = document.querySelector('.plans-grid');
+    if (plansGrid) planObs.observe(plansGrid);
+  </script>
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Dynamics | Engineering the Future</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #000;
+            --white: #fff;
+            --gray: rgba(255,255,255,0.35);
+            --border: rgba(255,255,255,0.12);
+        }
+
+        /* overflow-x: hidden on body breaks position:sticky — use clip instead.
+           clip trims overflow visually without creating a new scroll container. */
+        html  { background: var(--black); overflow-x: clip; }
+        body  { background: var(--black); color: var(--white); overflow-x: clip; }
+
+        body { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ── PRELOADER ── */
+        #preloader {
+            position: fixed; inset: 0;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column;
+            align-items: flex-start; justify-content: flex-end;
+            padding: 60px;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        #preloader.hidden { opacity: 0; visibility: hidden; }
+        .pre-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .pre-bar-track {
+            width: 280px; height: 1px;
+            background: rgba(255,255,255,0.15);
+            margin-bottom: 12px;
+        }
+        .pre-bar { height: 1px; background: #fff; width: 0%; transition: width 0.08s linear; }
+        .pre-pct {
+            font-family: 'Space Mono', monospace;
+            font-size: 3rem; font-weight: 700;
+            line-height: 1; color: #fff;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 28px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            mix-blend-mode: difference;
+        }
+        .nav-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem; letter-spacing: 4px;
+            text-transform: uppercase; color: #fff; font-weight: 700;
+        }
+        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .nav-links a {
+            color: #fff; text-decoration: none;
+            font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+            opacity: 0.6; transition: opacity 0.2s;
+        }
+        .nav-links a:hover { opacity: 1; }
+
+        /* ── HERO ── */
+        .hero {
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            padding: 120px 48px 60px;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-top {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .hero-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 5px;
+            text-transform: uppercase; color: var(--gray);
+            margin-bottom: 24px;
+        }
+        .hero-title {
+            font-size: clamp(5rem, 13vw, 13rem);
+            font-weight: 700;
+            line-height: 0.88;
+            letter-spacing: -5px;
+            text-transform: uppercase;
+        }
+        .hero-title .outline {
+            -webkit-text-stroke: 1px rgba(255,255,255,0.4);
+            color: transparent;
+        }
+        .hero-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+        .hero-desc {
+            max-width: 380px;
+            font-size: 1rem;
+            color: var(--gray);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+        .hero-meta {
+            text-align: right;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray);
+            line-height: 2;
+        }
+        .hero-cta {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 14px 36px;
+            border: 1px solid #fff;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-family: 'Space Mono', monospace;
+            transition: background 0.25s, color 0.25s;
+        }
+        .hero-cta:hover { background: #fff; color: #000; }
+
+        /* ── SCROLL SEQUENCE ── */
+        .seq-section { position: relative; }
+
+        .seq-sticky {
+            position: sticky; top: 0; height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Canvas fills viewport */
+        #seq-canvas {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* Top and bottom fades to blend with site background */
+        .seq-fade-top, .seq-fade-bottom {
+            position: absolute; left: 0; right: 0;
+            height: 200px; z-index: 5; pointer-events: none;
+        }
+        .seq-fade-top {
+            top: 0;
+            background: linear-gradient(to bottom, #000 0%, transparent 100%);
+        }
+        .seq-fade-bottom {
+            bottom: 0;
+            background: linear-gradient(to top, #000 0%, transparent 100%);
+        }
+
+        /* Scan-line texture overlay */
+        .scanlines {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.04) 2px,
+                rgba(0,0,0,0.04) 4px
+            );
+            pointer-events: none; z-index: 2;
+        }
+
+        /* Vignette */
+        .vignette {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 50%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none; z-index: 3;
+        }
+
+        /* Chapter labels — corner */
+        .seq-chapter {
+            position: absolute;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            z-index: 10;
+            top: 40px; left: 48px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .seq-chapter.visible { opacity: 1; }
+
+        /* Large overlaid text — staggered positions */
+        .seq-line {
+            position: absolute;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .seq-line.visible { opacity: 1; transform: none !important; }
+
+        /* Panel A — bottom left, large */
+        .seq-line-a {
+            bottom: 80px; left: 48px;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700; line-height: 1.05;
+            letter-spacing: -2px; text-transform: uppercase;
+            max-width: 55vw;
+            transform: translateY(20px);
+        }
+        .seq-line-a small {
+            display: block;
+            font-size: 0.7rem; letter-spacing: 4px;
+            font-weight: 400; color: var(--gray);
+            margin-bottom: 10px; font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        /* Panel B — top right */
+        .seq-line-b {
+            top: 100px; right: 48px;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700; line-height: 1.05;
+            letter-spacing: -2px; text-transform: uppercase;
+            text-align: right; max-width: 50vw;
+            transform: translateY(-20px);
+        }
+        .seq-line-b small {
+            display: block;
+            font-size: 0.7rem; letter-spacing: 4px;
+            font-weight: 400; color: var(--gray);
+            margin-bottom: 10px; font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        /* Panel C — center */
+        .seq-line-c {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -40%);
+            text-align: center;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700; line-height: 1;
+            letter-spacing: -3px; text-transform: uppercase;
+            width: 80vw;
+        }
+        .seq-line-c.visible { transform: translate(-50%, -50%) !important; }
+        .seq-line-c small {
+            display: block;
+            font-size: 0.7rem; letter-spacing: 4px;
+            font-weight: 400; color: var(--gray);
+            margin-bottom: 10px; font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        /* Scroll progress bar */
+        .seq-scrubbar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+        .seq-scrubfill {
+            height: 100%; background: #fff;
+            width: 0%; transition: width 0.05s linear;
+        }
+
+        /* ── SPECS — FULL BLEED NUMBERED ── */
+        .specs-section {
+            padding: 0;
+            border-top: 1px solid var(--border);
+        }
+        .spec-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            align-items: center;
+            padding: 52px 48px;
+            border-bottom: 1px solid var(--border);
+            gap: 48px;
+        }
+        .spec-row:hover { background: rgba(255,255,255,0.025); }
+        .spec-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem; letter-spacing: 3px;
+            color: var(--gray); text-transform: uppercase;
+        }
+        .spec-name {
+            font-size: 0.8rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--gray);
+            font-weight: 400;
+        }
+        .spec-value-row {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 700; letter-spacing: -3px;
+            line-height: 1; text-align: right;
+        }
+        .spec-value-row sub {
+            font-size: 1.2rem; letter-spacing: 0;
+            font-weight: 300; color: var(--gray);
+            vertical-align: baseline; margin-left: 4px;
+        }
+
+        /* ── FEATURES — EDITORIAL ── */
+        .features-section {
+            padding: 160px 48px;
+            max-width: 1300px; margin: 0 auto;
+        }
+        .feat-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 120px;
+            align-items: end;
+        }
+        .feat-header-title {
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 700; letter-spacing: -3px;
+            text-transform: uppercase; line-height: 0.9;
+        }
+        .feat-header-title .outline {
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            color: transparent;
+        }
+        .feat-header-right {
+            padding-top: 20px;
+        }
+        .feat-header-desc {
+            font-size: 1rem; color: var(--gray);
+            line-height: 1.8; font-weight: 300; margin-bottom: 32px;
+        }
+        .feat-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid var(--border);
+        }
+        .feat-item {
+            padding: 48px 0;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        .feat-item:nth-child(odd) { padding-right: 48px; border-right: 1px solid var(--border); }
+        .feat-item:nth-child(even) { padding-left: 48px; }
+        .feat-n {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem; color: var(--gray);
+            letter-spacing: 2px; padding-top: 4px;
+        }
+        .feat-item h3 {
+            font-size: 1.1rem; font-weight: 700;
+            margin-bottom: 12px; letter-spacing: -0.3px;
+        }
+        .feat-item p { font-size: 0.875rem; color: var(--gray); line-height: 1.75; font-weight: 300; }
+
+        /* ── MARQUEE DIVIDER ── */
+        .marquee-wrap {
+            overflow: hidden;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            background: #000;
+        }
+        .marquee-track {
+            display: flex; gap: 80px;
+            animation: marquee 20s linear infinite;
+            white-space: nowrap;
+        }
+        .marquee-item {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 5px;
+            text-transform: uppercase; color: var(--gray);
+            flex-shrink: 0;
+        }
+        .marquee-sep { color: rgba(255,255,255,0.2); }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* ── CTA ── */
+        .cta-section {
+            padding: 200px 48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; align-items: end;
+            border-top: 1px solid var(--border);
+        }
+        .cta-title {
+            font-size: clamp(4rem, 10vw, 9rem);
+            font-weight: 700; letter-spacing: -5px;
+            text-transform: uppercase; line-height: 0.88;
+            grid-column: 1 / -1;
+        }
+        .cta-title .outline {
+            -webkit-text-stroke: 1px rgba(255,255,255,0.25);
+            color: transparent;
+        }
+        .cta-sub { font-size: 1rem; color: var(--gray); line-height: 1.75; font-weight: 300; max-width: 380px; }
+        .cta-action { text-align: right; }
+        .cta-price {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 48px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--gray);
+        }
+        .footer-copy {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.2);
+        }
+
+        /* ── REVEAL ── */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.9s ease, transform 0.9s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+        .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.9s ease, transform 0.9s ease; }
+        .reveal-left.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 768px) {
+            nav { padding: 20px 24px; }
+            .nav-links { display: none; }
+            .hero { padding: 100px 24px 40px; }
+            .hero-title { letter-spacing: -3px; }
+            .hero-bottom { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .seq-line-a, .seq-line-b { font-size: clamp(1.5rem, 6vw, 3rem); }
+            .spec-row { grid-template-columns: 48px 1fr; padding: 36px 24px; }
+            .spec-value-row { text-align: left; grid-column: 2; }
+            .feat-header { grid-template-columns: 1fr; }
+            .feat-list { grid-template-columns: 1fr; }
+            .feat-item:nth-child(odd) { border-right: none; padding-right: 0; }
+            .feat-item:nth-child(even) { padding-left: 0; }
+            .cta-section { padding: 120px 24px; }
+            .cta-title { letter-spacing: -3px; }
+            .cta-section { grid-template-columns: 1fr; }
+            .cta-action { text-align: left; }
+            .features-section { padding: 80px 24px; }
+            footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+    <div class="pre-label">Loading System</div>
+    <div class="pre-bar-track"><div class="pre-bar" id="pre-bar"></div></div>
+    <div class="pre-pct" id="pre-pct">0%</div>
+</div>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-logo">Nexus Dynamics</div>
+    <ul class="nav-links">
+        <li><a href="#specs">Specs</a></li>
+        <li><a href="#features">System</a></li>
+        <li><a href="#order">Reserve</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-top">
+        <p class="hero-tag reveal">Gen IV — 2026</p>
+        <h1 class="hero-title reveal">
+            Nexus<br>
+            <span class="outline">Dynamics</span>
+        </h1>
+    </div>
+    <div class="hero-bottom reveal">
+        <div>
+            <p class="hero-desc">The world's first self-optimizing AI workstation. On-device inference. Zero compromise. Built for engineers redefining the edge of possibility.</p>
+            <a href="#order" class="hero-cta">Reserve — $4,299</a>
+        </div>
+        <div class="hero-meta">
+            Scroll to explore<br>
+            ↓
+        </div>
+    </div>
+</section>
+
+<!-- SCROLL SEQUENCE -->
+<div class="seq-section" id="seq-section">
+    <div class="seq-sticky" id="seq-sticky">
+
+        <canvas id="seq-canvas"></canvas>
+        <div class="scanlines"></div>
+        <div class="vignette"></div>
+        <div class="seq-fade-top"></div>
+        <div class="seq-fade-bottom"></div>
+
+        <!-- Chapter label -->
+        <div class="seq-chapter" id="seq-chapter">— Core Architecture</div>
+
+        <!-- Panel A: bottom left -->
+        <div class="seq-line seq-line-a" id="panel-a">
+            <small>01 — Neural Core</small>
+            Neural Processing<br>at its Peak
+        </div>
+
+        <!-- Panel B: top right -->
+        <div class="seq-line seq-line-b" id="panel-b">
+            <small>02 — Thermal Design</small>
+            Zero Throttle.<br>Sustained Power.
+        </div>
+
+        <!-- Panel C: center -->
+        <div class="seq-line seq-line-c" id="panel-c">
+            <small>03 — Unified Memory</small>
+            256GB.<br>1.2TB/s.
+        </div>
+
+        <!-- Panel D: bottom left -->
+        <div class="seq-line seq-line-a" id="panel-d" style="bottom:80px;left:48px;">
+            <small>04 — Final Assembly</small>
+            Every Component.<br>Engineered Together.
+        </div>
+
+        <!-- Scrub bar -->
+        <div class="seq-scrubbar"><div class="seq-scrubfill" id="seq-scrubfill"></div></div>
+
+    </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+    <div class="marquee-track">
+        <span class="marquee-item">Nexus Dynamics</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">AI Workstation</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">Gen IV</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">On-Device Inference</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">48 AI Cores</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">256GB Memory</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">3nm Process</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">Nexus Dynamics</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">AI Workstation</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">Gen IV</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">On-Device Inference</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">48 AI Cores</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">256GB Memory</span><span class="marquee-sep">×</span>
+        <span class="marquee-item">3nm Process</span><span class="marquee-sep">×</span>
+    </div>
+</div>
+
+<!-- SPECS -->
+<section class="specs-section" id="specs">
+    <div class="spec-row reveal">
+        <div class="spec-num">01</div>
+        <div class="spec-name">Unified Memory</div>
+        <div class="spec-value-row">256<sub>GB</sub></div>
+    </div>
+    <div class="spec-row reveal">
+        <div class="spec-num">02</div>
+        <div class="spec-name">AI Processor Cores</div>
+        <div class="spec-value-row">48<sub>cores</sub></div>
+    </div>
+    <div class="spec-row reveal">
+        <div class="spec-num">03</div>
+        <div class="spec-name">Memory Bandwidth</div>
+        <div class="spec-value-row">1.2<sub>TB/s</sub></div>
+    </div>
+    <div class="spec-row reveal">
+        <div class="spec-num">04</div>
+        <div class="spec-name">Peak AI Performance</div>
+        <div class="spec-value-row">12<sub>TOPs</sub></div>
+    </div>
+    <div class="spec-row reveal">
+        <div class="spec-num">05</div>
+        <div class="spec-name">Process Node</div>
+        <div class="spec-value-row">3<sub>nm</sub></div>
+    </div>
+    <div class="spec-row reveal">
+        <div class="spec-num">06</div>
+        <div class="spec-name">Max TDP</div>
+        <div class="spec-value-row">280<sub>W</sub></div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+    <div class="feat-header">
+        <div class="feat-header-title reveal-left">
+            Built<br>
+            <span class="outline">Different.</span><br>
+            By Design.
+        </div>
+        <div class="feat-header-right reveal">
+            <p class="feat-header-desc">Not a GPU cluster. Not a cloud instance. A purpose-built machine for the age of local AI — where your data stays yours and performance never waits on a network.</p>
+            <a href="#order" class="hero-cta">Learn More</a>
+        </div>
+    </div>
+
+    <div class="feat-list">
+        <div class="feat-item reveal">
+            <span class="feat-n">01</span>
+            <div>
+                <h3>On-Device Inference</h3>
+                <p>Run 70B+ parameter models locally. Your data never leaves the machine — complete privacy, zero latency penalty.</p>
+            </div>
+        </div>
+        <div class="feat-item reveal">
+            <span class="feat-n">02</span>
+            <div>
+                <h3>Self-Optimizing OS</h3>
+                <p>NexusOS learns your workload and dynamically reallocates compute before you notice a bottleneck.</p>
+            </div>
+        </div>
+        <div class="feat-item reveal">
+            <span class="feat-n">03</span>
+            <div>
+                <h3>Multi-Node Fabric</h3>
+                <p>Link up to 8 units over NexusLink at 400Gbps. Scale linearly — no separate networking switch required.</p>
+            </div>
+        </div>
+        <div class="feat-item reveal">
+            <span class="feat-n">04</span>
+            <div>
+                <h3>Hardware Secure Enclave</h3>
+                <p>Isolated silicon encrypts model weights and data at rest and in compute. Zero-trust by default.</p>
+            </div>
+        </div>
+        <div class="feat-item reveal">
+            <span class="feat-n">05</span>
+            <div>
+                <h3>Sustained Peak Clock</h3>
+                <p>Vapor-chamber cooling holds full clock speed indefinitely. No thermal throttling — ever.</p>
+            </div>
+        </div>
+        <div class="feat-item reveal">
+            <span class="feat-n">06</span>
+            <div>
+                <h3>Universal I/O</h3>
+                <p>Quad Thunderbolt 5, PCIe 5.0 ×16, 10GbE, and hot-swap NVMe bays. Connect anything.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="order">
+    <h2 class="cta-title reveal">
+        The<br>
+        Future<br>
+        <span class="outline">Doesn't</span><br>
+        Wait.
+    </h2>
+    <p class="cta-sub reveal">Limited first-run allocation. Ships Q3 2026. Reserve before the window closes — no payment until confirmation.</p>
+    <div class="cta-action reveal">
+        <p class="cta-price">Starting at $4,299 USD</p>
+        <a href="#" class="hero-cta">Reserve Your Unit</a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">Nexus Dynamics — Gen IV</div>
+    <div class="footer-copy">© 2026 Nexus Dynamics Inc.</div>
+    <div class="footer-copy">Engineered in the USA</div>
+</footer>
+
+<script>
+    // ── CONFIG ──────────────────────────────────────────────────────────────
+    const TOTAL  = 120;
+    const frame  = i => `frames/f${String(i).padStart(3,'0')}.jpg`;
+
+    // When (0–1 scroll progress) each panel is visible
+    const PANELS = [
+        { el: 'panel-a', from: 0.08, to: 0.30, chapter: '— Core Architecture' },
+        { el: 'panel-b', from: 0.33, to: 0.54, chapter: '— Thermal System'    },
+        { el: 'panel-c', from: 0.57, to: 0.76, chapter: '— Memory Architecture'},
+        { el: 'panel-d', from: 0.80, to: 1.00, chapter: '— Final Assembly'     },
+    ];
+
+    // ── PRELOAD ──────────────────────────────────────────────────────────────
+    const imgs   = [];
+    let   loaded = 0;
+    const barEl  = document.getElementById('pre-bar');
+    const pctEl  = document.getElementById('pre-pct');
+    const pre    = document.getElementById('preloader');
+
+    for (let i = 1; i <= TOTAL; i++) {
+        const img = new Image();
+        img.src = frame(i);
+        img.onload = img.onerror = () => {
+            loaded++;
+            const p = Math.round(loaded / TOTAL * 100);
+            barEl.style.width = p + '%';
+            pctEl.textContent = p + '%';
+            if (loaded === TOTAL) boot();
+        };
+        imgs.push(img);
+    }
+
+    // ── CANVAS ───────────────────────────────────────────────────────────────
+    const canvas = document.getElementById('seq-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function paint(img) {
+        if (!img?.complete || !img.naturalWidth) return;
+        const cw = canvas.width, ch = canvas.height;
+        const iw = img.naturalWidth,  ih = img.naturalHeight;
+        const s  = Math.max(cw / iw, ch / ih);
+        ctx.drawImage(img, (cw - iw*s)/2, (ch - ih*s)/2, iw*s, ih*s);
+    }
+
+    // ── SMOOTH SCROLL ANIMATION ───────────────────────────────────────────
+    // Key idea: lerp a "display" progress value toward the "target" progress
+    // value on every rAF tick. This decouples the frame update from scroll
+    // events and produces buttery-smooth playback.
+
+    let targetProgress  = 0;
+    let displayProgress = 0;
+    const LERP = 0.10; // lower = more lag but smoother; 0.10 feels film-like
+
+    const seqSection   = document.getElementById('seq-section');
+    const scrubFill    = document.getElementById('seq-scrubfill');
+    const chapterEl    = document.getElementById('seq-chapter');
+    const panelEls     = PANELS.map(p => document.getElementById(p.el));
+
+    let lastFrame = -1;
+
+    function tick() {
+        requestAnimationFrame(tick);
+
+        // Lerp display toward target
+        displayProgress += (targetProgress - displayProgress) * LERP;
+
+        // Choose frame
+        const fi = Math.round(displayProgress * (TOTAL - 1));
+        if (fi !== lastFrame) {
+            lastFrame = fi;
+            paint(imgs[fi]);
+        }
+
+        // Scrub bar
+        scrubFill.style.width = (displayProgress * 100) + '%';
+
+        // Panels + chapter
+        let activeChapter = '';
+        PANELS.forEach((p, i) => {
+            const vis = displayProgress >= p.from && displayProgress <= p.to;
+            panelEls[i].classList.toggle('visible', vis);
+            if (vis) activeChapter = p.chapter;
+        });
+
+        const showChapter = activeChapter !== '';
+        chapterEl.textContent = activeChapter;
+        chapterEl.classList.toggle('visible', showChapter);
+    }
+
+    // Update target on scroll (passive, cheap)
+    function onScroll() {
+        const rect  = seqSection.getBoundingClientRect();
+        const total = seqSection.offsetHeight - window.innerHeight;
+        targetProgress = Math.max(0, Math.min(1, -rect.top / total));
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── REVEAL ON SCROLL ────────────────────────────────────────────────────
+    function initReveal() {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal, .reveal-left').forEach(el => io.observe(el));
+    }
+
+    // ── BOOT ─────────────────────────────────────────────────────────────────
+    function boot() {
+        // Show first frame immediately
+        paint(imgs[0]);
+
+        // Section height drives scroll speed through 120 frames.
+        // 2.5× the viewport = snappy but still smooth.
+        // Also update on resize so it stays viewport-relative.
+        function setHeight() {
+            seqSection.style.height = (window.innerHeight * 2.5) + 'px';
+        }
+        setHeight();
+        window.addEventListener('resize', setHeight);
+
+        // Hide preloader
+        setTimeout(() => pre.classList.add('hidden'), 300);
+
+        // Kick off animation loop + reveal
+        tick();
+        initReveal();
+    }
+</script>
+</body>
+</html>
