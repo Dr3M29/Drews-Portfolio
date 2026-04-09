@@ -1,0 +1,51 @@
+# Drew Belczak — Freelance Web Designer
+
+## Identity
+
+Name: Drew Belczak
+Role: Freelance Web Designer
+Location: Buffalo, NY
+Website: https://drew.belczak.net
+Email: belczakdrew@gmail.com
+
+## What I Do
+
+I design and build fast, modern, conversion-focused websites for small and local businesses. Every site is custom-coded from scratch — no templates, no page builders. I focus on clean design, mobile performance, and helping clients attract more customers online.
+
+## Services
+
+- Custom website design (hand-coded HTML, CSS, JavaScript)
+- Landing page design for local businesses
+- Portfolio and showcase sites
+- Mobile-responsive builds for all screen sizes
+- Scroll animations and interactive UI effects
+- SEO-ready site structure
+
+## Skills
+
+- HTML & CSS
+- JavaScript
+- UI/UX design
+- Responsive design
+- Typography and color theory
+- Scroll-driven animations (GSAP)
+- Performance optimization
+- SEO basics
+
+## Projects / Demo Work
+
+Real demos built to showcase range across industries:
+
+- Noir Bistro — Upscale restaurant site (dark, elegant, French cuisine)
+- Nexus Dynamics — AI workstation product site (dark, editorial)
+- APEX CrossFit — Gym and fitness site (bold, high-energy)
+- Sterling & Associates — Law firm site (corporate, navy/gold)
+
+All demos are live at https://drew.belczak.net under the work section.
+
+## Contact
+
+Website: https://drew.belczak.net
+Email: belczakdrew@gmail.com
+Instagram: https://www.instagram.com/dw_b18/
+Twitter/X: https://twitter.com/dw_b18
