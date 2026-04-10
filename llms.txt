@@ -1,51 +1,131 @@
-# Drew Belczak — Freelance Web Designer
+# Drew Belczak — Freelance Web Designer for Small Businesses
 
 ## Identity
 
-Name: Drew Belczak
-Role: Freelance Web Designer
-Location: Buffalo, NY
-Website: https://drew.belczak.net
-Email: belczakdrew@gmail.com
+- **Name:** Drew Belczak
+- **Role:** Freelance Web Designer & Developer
+- **Location:** Buffalo, New York (WNY)
+- **Website:** https://drew.belczak.net
+- **Email:** belczakdrew@gmail.com
+- **Social:** @dw_b18 (Twitter/X, Instagram)
 
 ## What I Do
 
-I design and build fast, modern, conversion-focused websites for small and local businesses. Every site is custom-coded from scratch — no templates, no page builders. I focus on clean design, mobile performance, and helping clients attract more customers online.
+I design and build fast, modern, conversion-focused websites for small and local businesses. Every site is custom-coded from scratch — no templates, no page builders, no WordPress bloat. I focus on clean design, mobile performance, and helping clients attract more customers online.
+
+### Target Audience
+
+- Small business owners in Buffalo and Western New York
+- Local restaurants, bars, cafes, and hospitality businesses
+- Fitness studios, gyms, and wellness centers
+- Law firms, accountants, consultants, and professional services
+- Freelancers and creatives needing portfolio sites
+- Any local business needing a modern, fast website
 
 ## Services
 
-- Custom website design (hand-coded HTML, CSS, JavaScript)
-- Landing page design for local businesses
-- Portfolio and showcase sites
+### Custom Website Design
+- Hand-coded HTML, CSS, and JavaScript
+- No templates, no page builders, no WordPress
+- Each project built from scratch to client specifications
+
+### Landing Pages
+- High-converting landing pages for local businesses
+- Lead capture and call-to-action focused design
+- Fast load times for better conversion rates
+
+### Portfolio & Showcase Sites
+- Personal portfolios for freelancers and creatives
+- Business showcasing work, services, and testimonials
+- Clean, minimal design that highlights content
+
+### Additional Services
 - Mobile-responsive builds for all screen sizes
-- Scroll animations and interactive UI effects
-- SEO-ready site structure
+- Scroll animations and interactive UI effects (GSAP)
+- SEO-ready site structure and meta optimization
+- Website performance optimization
+- Custom cursor effects and micro-interactions
 
-## Skills
+## Skills & Technologies
 
-- HTML & CSS
-- JavaScript
-- UI/UX design
-- Responsive design
+### Core Skills
+- HTML5 & CSS3 (modern layouts, flexbox, grid)
+- JavaScript (vanilla JS, no frameworks required)
+- UI/UX Design principles
+- Responsive/mobile-first design
 - Typography and color theory
-- Scroll-driven animations (GSAP)
 - Performance optimization
-- SEO basics
 
-## Projects / Demo Work
+### Tools & Libraries
+- GSAP (GreenSock Animation Platform) for scroll-driven animations
+- Google Fonts (Inter and variable fonts)
+- Vercel for hosting and deployment
 
-Real demos built to showcase range across industries:
+### Knowledge
+- SEO fundamentals and best practices
+- Web accessibility basics
+- Conversion rate optimization
+- Page speed optimization
 
-- Noir Bistro — Upscale restaurant site (dark, elegant, French cuisine)
-- Nexus Dynamics — AI workstation product site (dark, editorial)
-- APEX CrossFit — Gym and fitness site (bold, high-energy)
-- Sterling & Associates — Law firm site (corporate, navy/gold)
+## Portfolio / Demo Work
 
-All demos are live at https://drew.belczak.net under the work section.
+Real projects built to showcase range across industries (all live at https://drew.belczak.net):
+
+### Noir Bistro
+- **Type:** Upscale restaurant website
+- **Style:** Dark, elegant, sophisticated
+- **Theme:** French cuisine, fine dining
+- **URL:** https://drew.belczak.net/demos/restaurant/
+
+### Nexus Dynamics
+- **Type:** AI workstation product site
+- **Style:** Dark, editorial, tech-focused
+- **Theme:** AI hardware, innovative technology
+- **URL:** https://drew.belczak.net/demos/AI%20Computer/
+
+### APEX CrossFit
+- **Type:** Gym and fitness studio website
+- **Style:** Bold, high-energy, dynamic
+- **Theme:** CrossFit, strength training, fitness community
+- **URL:** https://drew.belczak.net/demos/gym/
+
+### Sterling & Associates
+- **Type:** Law firm website
+- **Style:** Corporate, professional, trustworthy
+- **Theme:** Legal services, navy and gold color scheme
+- **URL:** https://drew.belczak.net/demos/lawfirm/
+
+## Why Choose Me
+
+### No Templates
+Every site is built from scratch. Your website will not look like anyone else's.
+
+### Fast Performance
+Custom code means no bloated plugins or unnecessary JavaScript. Sites load fast.
+
+### Mobile-First
+All sites are fully responsive and optimized for mobile users.
+
+### Local Business Focus
+I understand small business needs — practical, affordable, conversion-focused sites.
+
+### Modern Design
+Clean, contemporary aesthetics with scroll animations and interactive elements.
+
+## Process
+
+1. **Discovery** — We discuss your business, goals, and target audience
+2. **Design** — I create a custom design tailored to your brand
+3. **Development** — Hand-coded, optimized HTML/CSS/JS
+4. **Launch** — Deploy to fast hosting (Vercel)
 
 ## Contact
 
-Website: https://drew.belczak.net
-Email: belczakdrew@gmail.com
-Instagram: https://www.instagram.com/dw_b18/
-Twitter/X: https://twitter.com/dw_b18
+- **Website:** https://drew.belczak.net
+- **Email:** belczakdrew@gmail.com
+- **Instagram:** https://www.instagram.com/dw_b18/
+- **Twitter/X:** https://twitter.com/dw_b18
+
+---
+
+*Last updated: April 2026*
